@@ -1,0 +1,1 @@
+export { ReminderTemplateScreen } from "../index";

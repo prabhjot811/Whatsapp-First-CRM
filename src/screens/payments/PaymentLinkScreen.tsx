@@ -1,0 +1,1 @@
+export { PaymentLinkScreen } from "../index";

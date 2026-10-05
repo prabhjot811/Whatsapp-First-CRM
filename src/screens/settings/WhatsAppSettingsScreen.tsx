@@ -1,0 +1,1 @@
+export { WhatsAppSettingsScreen } from "../index";

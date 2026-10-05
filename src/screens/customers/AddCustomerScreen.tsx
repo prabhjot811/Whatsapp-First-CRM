@@ -1,0 +1,1 @@
+export { AddCustomerScreen } from "../index";
