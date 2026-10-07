@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ScrollView, Text, View, Pressable } from "react-native";
 import { EmptyState, SectionHeader } from "../../components/ui";
+import { FinanceScreenBackground } from "../../components/layout/FinanceScreenBackground";
 import { TransactionCard } from "../../components/composite/TransactionCard";
 import { mockService } from "../../services/mockServices";
 import { styles, transactionFilters, useRefreshOnFocus } from "../shared";
@@ -20,13 +21,11 @@ export function TransactionsScreen({
   );
 
   return (
-    <ScrollView
-      style={[
-        styles.listContainer,
-        { backgroundColor: theme.colors.background },
-      ]}
-      contentContainerStyle={styles.contentContainer}
-    >
+    <FinanceScreenBackground theme={theme}>
+      <ScrollView
+        style={[styles.listContainer, { backgroundColor: "transparent" }]}
+        contentContainerStyle={styles.contentContainer}
+      >
       <SectionHeader title="Transaction history" theme={theme} />
       <View style={styles.filterRow}>
         {transactionFilters.map((item) => (
@@ -77,7 +76,8 @@ export function TransactionsScreen({
           theme={theme}
         />
       ))}
-    </ScrollView>
+      </ScrollView>
+    </FinanceScreenBackground>
   );
 }
 

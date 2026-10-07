@@ -161,6 +161,7 @@ export function RecordPaymentScreen({
         onPress={handleSave}
         theme={theme}
         disabled={amountError !== null || exceedsBalance || outstanding <= 0}
+        gradient
       />
     </ScreenWrapper>
   );

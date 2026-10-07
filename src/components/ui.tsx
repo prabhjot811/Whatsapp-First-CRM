@@ -1,5 +1,6 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import type { AppTheme } from "../theme/theme";
 
 type ButtonVariant = "primary" | "secondary" | "ghost";
@@ -11,6 +12,7 @@ export type AppButtonProps = {
   variant?: ButtonVariant;
   disabled?: boolean;
   loading?: boolean;
+  gradient?: boolean;
 };
 
 export function AppButton({
@@ -20,6 +22,7 @@ export function AppButton({
   variant = "primary",
   disabled = false,
   loading = false,
+  gradient = false,
 }: AppButtonProps) {
   const isPrimary = variant === "primary";
   const isSecondary = variant === "secondary";
@@ -39,13 +42,26 @@ export function AppButton({
       style={({ pressed }) => [
         {
           opacity: disabled || loading ? 0.7 : pressed ? 0.9 : 1,
-          backgroundColor,
+          backgroundColor: gradient && isPrimary ? "transparent" : backgroundColor,
           borderWidth: variant === "ghost" ? 1 : 0,
           borderColor,
         },
         styles.button,
+        gradient && isPrimary ? styles.gradientButton : null,
       ]}
     >
+      {gradient && isPrimary ? (
+        <LinearGradient
+          colors={[
+            theme.colors.primaryGradientStart,
+            theme.colors.primaryGradientEnd,
+          ]}
+          end={{ x: 1, y: 0.5 }}
+          pointerEvents="none"
+          start={{ x: 0, y: 0.5 }}
+          style={StyleSheet.absoluteFill}
+        />
+      ) : null}
       <Text style={[styles.buttonText, { color: textColor }]}>
         {loading ? "Please wait..." : title}
       </Text>
@@ -292,6 +308,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     borderRadius: 14,
     minHeight: 48,
+  },
+  gradientButton: {
+    overflow: "hidden",
+    position: "relative",
   },
   buttonText: {
     fontSize: 15,

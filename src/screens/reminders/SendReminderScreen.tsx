@@ -171,6 +171,7 @@ export function ReminderScreen({
           onPress={sendReminder}
           theme={theme}
           disabled={amount <= 0}
+          gradient
         />
         <AppButton
           title="Customize Message"

@@ -1,6 +1,7 @@
 import { ScrollView, Text, View } from "react-native";
 import { AppButton, Card, EmptyState, ErrorState, SectionHeader } from "../../components/ui";
 import { Header } from "../../components/layout/Header";
+import { FinanceScreenBackground } from "../../components/layout/FinanceScreenBackground";
 import { mockService } from "../../services/mockServices";
 import { formatDate } from "../../utils/dateFormatter";
 import { useCurrencyFormatter } from "../../hooks/useCurrencyFormatter";
@@ -36,23 +37,23 @@ export function CustomerDetailScreen({
 
   if (!customer) {
     return (
-      <ErrorState
-        title="Customer not found"
-        description="This customer could not be loaded."
-        onRetry={() => navigation.goBack()}
-        theme={theme}
-      />
+      <FinanceScreenBackground theme={theme}>
+        <ErrorState
+          title="Customer not found"
+          description="This customer could not be loaded."
+          onRetry={() => navigation.goBack()}
+          theme={theme}
+        />
+      </FinanceScreenBackground>
     );
   }
 
   return (
-    <ScrollView
-      style={[
-        styles.listContainer,
-        { backgroundColor: theme.colors.background },
-      ]}
-      contentContainerStyle={styles.contentContainer}
-    >
+    <FinanceScreenBackground theme={theme}>
+      <ScrollView
+        style={[styles.listContainer, { backgroundColor: "transparent" }]}
+        contentContainerStyle={styles.contentContainer}
+      >
       <Header
         title={customer.name}
         theme={theme}
@@ -89,6 +90,7 @@ export function CustomerDetailScreen({
             navigation.navigate("SendReminder", { customerId: customer.id })
           }
           theme={theme}
+          gradient
         />
         <AppButton
           title="Add Due"
@@ -151,6 +153,7 @@ export function CustomerDetailScreen({
           </Text>
         </Card>
       ))}
-    </ScrollView>
+      </ScrollView>
+    </FinanceScreenBackground>
   );
 }

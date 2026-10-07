@@ -98,7 +98,7 @@ export function AddDueScreen({ route, navigation, theme }: AddDueScreenProps) {
           {error}
         </Text>
       ) : null}
-      <AppButton title="Save" onPress={handleSave} theme={theme} />
+      <AppButton title="Save" onPress={handleSave} theme={theme} gradient />
     </ScreenWrapper>
   );
 }

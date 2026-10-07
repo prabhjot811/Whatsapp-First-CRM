@@ -7,6 +7,7 @@ import {
   type ViewStyle,
 } from "react-native";
 import type { AppTheme } from "../../theme/theme";
+import { FinanceScreenBackground } from "./FinanceScreenBackground";
 
 interface ScreenWrapperProps extends React.PropsWithChildren {
   theme: AppTheme;
@@ -20,30 +21,31 @@ export function ScreenWrapper({
   scrollable = false,
   contentContainerStyle,
 }: ScreenWrapperProps) {
-  const baseStyle = [
-    styles.container,
-    { backgroundColor: theme.colors.background },
-  ];
   if (scrollable) {
     return (
-      <ScrollView
-        contentContainerStyle={[styles.content, contentContainerStyle]}
-        keyboardShouldPersistTaps="handled"
-        style={baseStyle}
-      >
-        {children}
-      </ScrollView>
+      <FinanceScreenBackground theme={theme}>
+        <ScrollView
+          contentContainerStyle={[styles.content, contentContainerStyle]}
+          keyboardShouldPersistTaps="handled"
+          style={styles.transparent}
+        >
+          {children}
+        </ScrollView>
+      </FinanceScreenBackground>
     );
   }
 
   return (
-    <View style={[...baseStyle, styles.content, contentContainerStyle]}>
-      {children}
-    </View>
+    <FinanceScreenBackground theme={theme}>
+      <View style={[styles.container, styles.content, contentContainerStyle]}>
+        {children}
+      </View>
+    </FinanceScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  transparent: { backgroundColor: "transparent" },
   content: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 28 },
 });

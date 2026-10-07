@@ -4,6 +4,7 @@ import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { type CompositeScreenProps } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { SectionHeader } from "../../components/ui";
+import { FinanceScreenBackground } from "../../components/layout/FinanceScreenBackground";
 import { ReminderCard } from "../../components/composite/ReminderCard";
 import { mockService } from "../../services/mockServices";
 import { type AppTabParamList, type RootStackParamList } from "../../navigation/types";
@@ -29,50 +30,47 @@ export function ReminderHistoryScreen({
   );
 
   return (
-    <View
-      style={[
-        styles.listContainer,
-        { backgroundColor: theme.colors.background },
-      ]}
-    >
-      <SectionHeader title="Reminder history" theme={theme} />
-      <View style={styles.filterRow}>
-        {reminderFilters.map((item) => (
-          <Pressable
-            key={item}
-            onPress={() => setFilter(item)}
-            style={[
-              styles.filterChip,
-              {
-                backgroundColor:
-                  filter === item ? theme.colors.primary : theme.colors.surface,
-                borderColor: theme.colors.border,
-              },
-            ]}
-          >
-            <Text
+    <FinanceScreenBackground theme={theme}>
+      <View style={[styles.listContainer, { backgroundColor: "transparent" }]}>
+        <SectionHeader title="Reminder history" theme={theme} />
+        <View style={styles.filterRow}>
+          {reminderFilters.map((item) => (
+            <Pressable
+              key={item}
+              onPress={() => setFilter(item)}
               style={[
-                styles.filterText,
-                { color: filter === item ? "#fff" : theme.colors.textPrimary },
+                styles.filterChip,
+                {
+                  backgroundColor:
+                    filter === item ? theme.colors.primary : theme.colors.surface,
+                  borderColor: theme.colors.border,
+                },
               ]}
             >
-              {item}
-            </Text>
-          </Pressable>
+              <Text
+                style={[
+                  styles.filterText,
+                  { color: filter === item ? "#fff" : theme.colors.textPrimary },
+                ]}
+              >
+                {item}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+        {filtered.map((reminder) => (
+          <ReminderCard
+            key={reminder.id}
+            reminder={reminder}
+            customerName={
+              mockService.getCustomer(reminder.customerId)?.name ??
+              "Unknown customer"
+            }
+            theme={theme}
+          />
         ))}
       </View>
-      {filtered.map((reminder) => (
-        <ReminderCard
-          key={reminder.id}
-          reminder={reminder}
-          customerName={
-            mockService.getCustomer(reminder.customerId)?.name ??
-            "Unknown customer"
-          }
-          theme={theme}
-        />
-      ))}
-    </View>
+    </FinanceScreenBackground>
   );
 }
 

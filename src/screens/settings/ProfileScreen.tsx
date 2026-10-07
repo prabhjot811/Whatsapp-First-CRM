@@ -1,6 +1,7 @@
 import { Text, View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppButton, Card } from "../../components/ui";
+import { FinanceScreenBackground } from "../../components/layout/FinanceScreenBackground";
 import { user } from "../../mock/data";
 import { useAuth } from "../../hooks/useAuth";
 import { useBusiness } from "../../hooks/useBusiness";
@@ -16,12 +17,13 @@ export function ProfileScreen({
   const { business: currentBusiness } = useBusiness();
 
   return (
-    <View
-      style={[
-        styles.screen,
-        { backgroundColor: theme.colors.background, paddingHorizontal: 20 },
-      ]}
-    >
+    <FinanceScreenBackground theme={theme}>
+      <View
+        style={[
+          styles.screen,
+          { backgroundColor: "transparent", paddingHorizontal: 20 },
+        ]}
+      >
       <Text style={[styles.screenTitle, { color: theme.colors.textPrimary }]}>
         Profile
       </Text>
@@ -45,6 +47,7 @@ export function ProfileScreen({
         theme={theme}
         variant="ghost"
       />
-    </View>
+      </View>
+    </FinanceScreenBackground>
   );
 }

@@ -1,5 +1,6 @@
 import { Alert, Text, View, Pressable } from "react-native";
 import { Card, SectionHeader } from "../../components/ui";
+import { FinanceScreenBackground } from "../../components/layout/FinanceScreenBackground";
 import { subscription } from "../../mock/data";
 import { useAuth } from "../../hooks/useAuth";
 import { styles } from "../shared";
@@ -34,27 +35,21 @@ export function MoreScreen({
   ] as const;
 
   return (
-    <View
-      style={[
-        styles.listContainer,
-        { backgroundColor: theme.colors.background },
-      ]}
-    >
-      <SectionHeader title="More" theme={theme} />
-      {settings.map((item) => (
-        <Pressable
-          key={item.label}
-          onPress={item.onPress}
-        >
-          <Card theme={theme}>
-            <Text
-              style={[styles.listTitle, { color: theme.colors.textPrimary }]}
-            >
-              {item.label}
-            </Text>
-          </Card>
-        </Pressable>
-      ))}
-    </View>
+    <FinanceScreenBackground theme={theme}>
+      <View style={[styles.listContainer, { backgroundColor: "transparent" }]}>
+        <SectionHeader title="More" theme={theme} />
+        {settings.map((item) => (
+          <Pressable key={item.label} onPress={item.onPress}>
+            <Card theme={theme}>
+              <Text
+                style={[styles.listTitle, { color: theme.colors.textPrimary }]}
+              >
+                {item.label}
+              </Text>
+            </Card>
+          </Pressable>
+        ))}
+      </View>
+    </FinanceScreenBackground>
   );
 }

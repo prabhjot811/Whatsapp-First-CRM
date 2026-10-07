@@ -91,7 +91,12 @@ export function AddCustomerScreen({
           {error}
         </Text>
       ) : null}
-      <AppButton title="Save Customer" onPress={handleSave} theme={theme} />
+      <AppButton
+        title="Save Customer"
+        onPress={handleSave}
+        theme={theme}
+        gradient
+      />
     </ScreenWrapper>
   );
 }

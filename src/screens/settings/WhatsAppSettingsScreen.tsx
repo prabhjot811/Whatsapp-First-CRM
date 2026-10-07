@@ -1,6 +1,7 @@
 import { Text, View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppButton, Card, StatusBadge } from "../../components/ui";
+import { FinanceScreenBackground } from "../../components/layout/FinanceScreenBackground";
 import { reminderTemplates } from "../../mock/data";
 import { type RootStackParamList } from "../../navigation/types";
 import { styles } from "../shared";
@@ -12,12 +13,13 @@ export function WhatsAppSettingsScreen({
 }: NativeStackScreenProps<RootStackParamList, "WhatsAppSettings"> &
   ThemeProps) {
   return (
-    <View
-      style={[
-        styles.screen,
-        { backgroundColor: theme.colors.background, paddingHorizontal: 20 },
-      ]}
-    >
+    <FinanceScreenBackground theme={theme}>
+      <View
+        style={[
+          styles.screen,
+          { backgroundColor: "transparent", paddingHorizontal: 20 },
+        ]}
+      >
       <Text style={[styles.screenTitle, { color: theme.colors.textPrimary }]}>
         WhatsApp Settings
       </Text>
@@ -39,7 +41,9 @@ export function WhatsAppSettingsScreen({
         title="Back"
         onPress={() => navigation.goBack()}
         theme={theme}
+        gradient
       />
-    </View>
+      </View>
+    </FinanceScreenBackground>
   );
 }

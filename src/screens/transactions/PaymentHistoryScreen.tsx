@@ -3,6 +3,7 @@ import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { type CompositeScreenProps } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { SectionHeader } from "../../components/ui";
+import { FinanceScreenBackground } from "../../components/layout/FinanceScreenBackground";
 import { PaymentCard } from "../../components/composite/PaymentCard";
 import { mockService } from "../../services/mockServices";
 import { type AppTabParamList, type RootStackParamList } from "../../navigation/types";
@@ -24,24 +25,21 @@ export function PaymentHistoryScreen({
   const payments = mockService.getPaymentHistory();
 
   return (
-    <View
-      style={[
-        styles.listContainer,
-        { backgroundColor: theme.colors.background },
-      ]}
-    >
-      <SectionHeader title="Payment history" theme={theme} />
-      {payments.map((payment) => (
-        <PaymentCard
-          key={payment.id}
-          payment={payment}
-          customerName={
-            mockService.getCustomer(payment.customerId)?.name ??
-            "Unknown customer"
-          }
-          theme={theme}
-        />
-      ))}
-    </View>
+    <FinanceScreenBackground theme={theme}>
+      <View style={[styles.listContainer, { backgroundColor: "transparent" }]}>
+        <SectionHeader title="Payment history" theme={theme} />
+        {payments.map((payment) => (
+          <PaymentCard
+            key={payment.id}
+            payment={payment}
+            customerName={
+              mockService.getCustomer(payment.customerId)?.name ??
+              "Unknown customer"
+            }
+            theme={theme}
+          />
+        ))}
+      </View>
+    </FinanceScreenBackground>
   );
 }

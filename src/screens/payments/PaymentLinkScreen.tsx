@@ -87,6 +87,7 @@ export function PaymentLinkScreen({
         onPress={createLink}
         theme={theme}
         disabled={!parsedAmount || exceedsBalance}
+        gradient
       />
       {error ? (
         <Text style={[styles.errorText, { color: theme.colors.error }]}>

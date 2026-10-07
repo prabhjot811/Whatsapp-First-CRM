@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FlatList, Text, TextInput, View, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { EmptyState } from "../../components/ui";
+import { FinanceScreenBackground } from "../../components/layout/FinanceScreenBackground";
 import { CustomerCard } from "../../components/composite/CustomerCard";
 import { mockService } from "../../services/mockServices";
 import { useDebounce } from "../../hooks/useDebounce";
@@ -33,12 +34,8 @@ export function CustomersScreen({ navigation, theme }: CustomersScreenProps) {
   });
 
   return (
-    <View
-      style={[
-        styles.listContainer,
-        { backgroundColor: theme.colors.background },
-      ]}
-    >
+    <FinanceScreenBackground theme={theme}>
+      <View style={[styles.listContainer, { backgroundColor: "transparent" }]}>
       <View style={styles.toolbar}>
         <TextInput
           value={query}
@@ -115,7 +112,8 @@ export function CustomersScreen({ navigation, theme }: CustomersScreenProps) {
           />
         }
       />
-    </View>
+      </View>
+    </FinanceScreenBackground>
   );
 }
 

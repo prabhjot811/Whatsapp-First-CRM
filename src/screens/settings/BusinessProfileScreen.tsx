@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Alert, Text, View, Pressable } from "react-native";
 import { AppButton, InputField } from "../../components/ui";
+import { FinanceScreenBackground } from "../../components/layout/FinanceScreenBackground";
 import { isValidPhone } from "../../utils/validators";
 import type { BusinessType, CurrencyCode } from "../../types";
 import { useBusiness } from "../../hooks/useBusiness";
@@ -41,12 +42,13 @@ export function BusinessProfileScreen({
   };
 
   return (
-    <View
-      style={[
-        styles.screen,
-        { backgroundColor: theme.colors.background, paddingHorizontal: 20 },
-      ]}
-    >
+    <FinanceScreenBackground theme={theme}>
+      <View
+        style={[
+          styles.screen,
+          { backgroundColor: "transparent", paddingHorizontal: 20 },
+        ]}
+      >
       <Text style={[styles.screenTitle, { color: theme.colors.textPrimary }]}>
         Business Profile
       </Text>
@@ -145,7 +147,9 @@ export function BusinessProfileScreen({
         title="Save Changes"
         onPress={handleSave}
         theme={theme}
+        gradient
       />
-    </View>
+      </View>
+    </FinanceScreenBackground>
   );
 }

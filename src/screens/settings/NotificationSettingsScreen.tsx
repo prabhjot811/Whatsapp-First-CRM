@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Text, View, Pressable } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppButton, Card } from "../../components/ui";
+import { FinanceScreenBackground } from "../../components/layout/FinanceScreenBackground";
 import { notificationSettings } from "../../mock/data";
 import { type RootStackParamList } from "../../navigation/types";
 import { notificationOptions, styles } from "../shared";
@@ -18,12 +19,13 @@ export function NotificationSettingsScreen({
     setSettings((current) => ({ ...current, [key]: !current[key] }));
 
   return (
-    <View
-      style={[
-        styles.screen,
-        { backgroundColor: theme.colors.background, paddingHorizontal: 20 },
-      ]}
-    >
+    <FinanceScreenBackground theme={theme}>
+      <View
+        style={[
+          styles.screen,
+          { backgroundColor: "transparent", paddingHorizontal: 20 },
+        ]}
+      >
       <Text style={[styles.screenTitle, { color: theme.colors.textPrimary }]}>
         Notifications
       </Text>
@@ -65,7 +67,9 @@ export function NotificationSettingsScreen({
         title="Back"
         onPress={() => navigation.goBack()}
         theme={theme}
+        gradient
       />
-    </View>
+      </View>
+    </FinanceScreenBackground>
   );
 }
