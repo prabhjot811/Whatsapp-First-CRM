@@ -22,6 +22,84 @@ import { PhoneLoginIllustration } from "./PhoneLoginIllustration";
 import { countries, type Country } from "./countries";
 import type { LoginScreenProps } from "../shared";
 
+type PhoneLengthGroup = {
+  iso2Codes: string;
+  lengths: readonly number[];
+};
+
+// National mobile-number lengths exclude the international dialing code.
+const phoneLengthGroups: readonly PhoneLengthGroup[] = [
+  { lengths: [5], iso2Codes: "CK FK SH" },
+  { lengths: [6], iso2Codes: "FO GL NC NF WF" },
+  {
+    lengths: [7],
+    iso2Codes: "AW BZ IO BN CV KM ER FJ GY MV MH FM NR PW ST SC SR TO VU",
+  },
+  {
+    lengths: [8],
+    iso2Codes:
+      "AM BH BT BO BW BF BI CF TD CR CU CY DK DJ TL SV SZ PF GI GT HT HN HK KI XK KW LV LS LT MO ML MT MR MU MD MN ME NI NE MK NO OM PG QA SM SL SG SI SJ TG TN TM UY",
+  },
+  {
+    lengths: [9],
+    iso2Codes:
+      "AF AL DZ AO AU AZ BY BE CM CL CX CC CZ EC GQ ET FR GF GE GH GP GN GW HU IE IL JO KE KG LY LU MG MW MQ YT MA MZ NA PS PY PE PL PT CG RE RO RW BL MF SA SN SK SS ES LK SD SE CH SY TW TJ TZ TH UG UA AE UZ VN EH YE ZM ZW",
+  },
+  {
+    lengths: [10],
+    iso2Codes:
+      "AS AI AG BS BD BB BJ BM VG CA KY CO DM DO EG GR GD GU GG IN IR IQ IM CI JM JP JE KZ MX MS NP NG KP MP PK PH PR RU KN LC VC SX TT TR TC VI GB US VE",
+  },
+  { lengths: [11], iso2Codes: "CN" },
+  { lengths: [6, 9], iso2Codes: "AD PM" },
+  { lengths: [10, 11], iso2Codes: "AR BR DE" },
+  { lengths: [7, 8, 9, 10, 11, 12, 13], iso2Codes: "AT" },
+  { lengths: [8, 9], iso2Codes: "BA BG KH HR MC" },
+  { lengths: [7, 8], iso2Codes: "CW EE GA LB PA" },
+  { lengths: [7, 9], iso2Codes: "CD GM IS LR LI" },
+  { lengths: [6, 7, 8, 9, 10], iso2Codes: "FI" },
+  { lengths: [9, 10, 11, 12], iso2Codes: "ID" },
+  { lengths: [9, 10], iso2Codes: "IT LA MY KR VA" },
+  { lengths: [7, 8, 9, 10], iso2Codes: "MM" },
+  { lengths: [9, 11], iso2Codes: "NL" },
+  { lengths: [8, 9, 10], iso2Codes: "NZ PN RS" },
+  { lengths: [4, 7], iso2Codes: "NU" },
+  { lengths: [7, 10], iso2Codes: "WS" },
+  { lengths: [5, 7], iso2Codes: "SB" },
+  { lengths: [7, 8, 9], iso2Codes: "SO" },
+  { lengths: [5, 6, 7, 8, 9], iso2Codes: "ZA" },
+  { lengths: [4, 5, 6, 7], iso2Codes: "TK" },
+  { lengths: [6, 7], iso2Codes: "TV" },
+];
+
+const phoneLengthsByCountry: Record<string, readonly number[]> = {};
+for (const group of phoneLengthGroups) {
+  for (const iso2 of group.iso2Codes.split(" ")) {
+    phoneLengthsByCountry[iso2] = group.lengths;
+  }
+}
+
+function getPhoneNumberLengthError(country: Country, value: string) {
+  const lengths = phoneLengthsByCountry[country.iso2];
+  if (!lengths) {
+    return `Phone number length rules are unavailable for ${country.name}.`;
+  }
+
+  const digits = value.replace(/\D/g, "");
+  if (lengths.includes(digits.length)) return "";
+
+  if (lengths.length === 1) {
+    return `Please enter a valid ${lengths[0]}-digit phone number for ${country.name}.`;
+  }
+
+  const isContinuous =
+    lengths.length === Math.max(...lengths) - Math.min(...lengths) + 1;
+  const acceptedLengths = isContinuous
+    ? `${Math.min(...lengths)}-${Math.max(...lengths)} digits`
+    : `${lengths.join(", ")} digits`;
+  return `Please enter a valid phone number for ${country.name} (${acceptedLengths}).`;
+}
+
 export function LoginScreen({ navigation, theme }: LoginScreenProps) {
   const { requestOtp } = useAuth();
   const { height, width } = useWindowDimensions();
@@ -30,19 +108,21 @@ export function LoginScreen({ navigation, theme }: LoginScreenProps) {
   );
   const [phoneNumber, setPhoneNumber] = useState("");
   const [error, setError] = useState("");
+  const [phoneTouched, setPhoneTouched] = useState(false);
   const scale = Math.min(
     Math.max(Math.min(width / 390, height / 720), 0.84),
     1.12,
   );
   const illustrationSize = Math.min(width * 0.74, height * 0.36, 290);
-  const maxNationalDigits = 15 - selectedCountry.dialCode.length;
-
   const handleContinue = () => {
     const digits = phoneNumber.replace(/\D/g, "");
-    if (digits.length < 6 || digits.length > maxNationalDigits) {
-      setError(
-        `Enter a valid phone number with 6 to ${maxNationalDigits} digits.`,
-      );
+    const validationError = getPhoneNumberLengthError(
+      selectedCountry,
+      phoneNumber,
+    );
+    setPhoneTouched(true);
+    if (validationError) {
+      setError(validationError);
       return;
     }
     const phone = `+${selectedCountry.dialCode} ${digits}`;
@@ -96,8 +176,8 @@ export function LoginScreen({ navigation, theme }: LoginScreenProps) {
                   styles.headingLine,
                   {
                     color: theme.colors.textPrimary,
-                    fontSize: typography.h1 * scale,
-                    lineHeight: typography.h1 * scale * 1.16,
+                    fontSize: (typography.h1 + 2) * scale,
+                    lineHeight: (typography.h1 + 2) * scale * 1.16,
                     fontWeight: "800",
                   },
                 ]}
@@ -109,8 +189,8 @@ export function LoginScreen({ navigation, theme }: LoginScreenProps) {
                   styles.headingLine,
                   {
                     color: theme.colors.textPrimary,
-                    fontSize: typography.h1 * scale,
-                    lineHeight: typography.h1 * scale * 1.16,
+                    fontSize: (typography.h1 + 2) * scale,
+                    lineHeight: (typography.h1 + 2) * scale * 1.16,
                     fontWeight: "800",
                   },
                 ]}
@@ -133,6 +213,7 @@ export function LoginScreen({ navigation, theme }: LoginScreenProps) {
                 selectedCountry={selectedCountry}
                 onSelect={(country) => {
                   setSelectedCountry(country);
+                  setPhoneTouched(false);
                   setError("");
                 }}
                 theme={theme}
@@ -145,7 +226,17 @@ export function LoginScreen({ navigation, theme }: LoginScreenProps) {
                 maxLength={20}
                 onChangeText={(value) => {
                   setPhoneNumber(value);
-                  if (error) setError("");
+                  if (phoneTouched) {
+                    setError(getPhoneNumberLengthError(selectedCountry, value));
+                  } else if (error) {
+                    setError("");
+                  }
+                }}
+                onBlur={() => {
+                  setPhoneTouched(true);
+                  setError(
+                    getPhoneNumberLengthError(selectedCountry, phoneNumber),
+                  );
                 }}
                 placeholder={
                   selectedCountry.iso2 === "IN"
@@ -271,7 +362,8 @@ const styles = StyleSheet.create({
   phoneInput: {
     flex: 1,
     minHeight: 50,
-    padding: 0,
+    paddingLeft: 12,
+    paddingVertical: 0,
   },
   errorText: {
     marginTop: 6,

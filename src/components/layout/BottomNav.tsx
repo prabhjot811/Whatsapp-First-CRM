@@ -38,7 +38,7 @@ export function BottomNav({ theme, toggleTheme }: BottomNavProps) {
             Customers: "people",
             Transactions: "cash",
             Reminders: "notifications",
-            More: "menu",
+            Profile: "person-circle",
           };
           return (
             <Ionicons
@@ -78,7 +78,10 @@ export function BottomNav({ theme, toggleTheme }: BottomNavProps) {
           />
         )}
       </Tab.Screen>
-      <Tab.Screen name="More">
+      <Tab.Screen
+        name="Profile"
+        options={{ tabBarLabel: "Profile" }}
+      >
         {(props) => (
           <MoreScreen {...props} theme={theme} toggleTheme={toggleTheme} />
         )}

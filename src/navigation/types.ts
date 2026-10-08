@@ -7,7 +7,7 @@ export type RootStackParamList = {
   AppTabs: undefined;
   CustomerDetail: { customerId: string };
   AddCustomer: undefined;
-  AddDue: { customerId: string };
+  AddDue: { customerId?: string } | undefined;
   RecordPayment: { customerId: string };
   SendReminder: { customerId: string };
   PaymentLink: { customerId: string };
@@ -27,5 +27,5 @@ export type AppTabParamList = {
   Customers: undefined;
   Transactions: undefined;
   Reminders: undefined;
-  More: undefined;
+  Profile: undefined;
 };

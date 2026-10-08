@@ -88,7 +88,7 @@ export type TransactionsScreenProps = CompositeScreenProps<
   ThemeProps;
 
 export type MoreScreenProps = CompositeScreenProps<
-  BottomTabScreenProps<AppTabParamList, "More">,
+  BottomTabScreenProps<AppTabParamList, "Profile">,
   NativeStackScreenProps<RootStackParamList>
 > &
   ThemeProps;

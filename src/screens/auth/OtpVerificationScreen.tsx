@@ -28,6 +28,7 @@ export function OtpScreen({ navigation, route, theme }: OtpScreenProps) {
   const { height, width } = useWindowDimensions();
   const inputRef = useRef<TextInput>(null);
   const [otp, setOtp] = useState("");
+  const [selection, setSelection] = useState({ start: 0, end: 0 });
   const [timer, setTimer] = useState(RESEND_DELAY_SECONDS);
   const [error, setError] = useState("");
   const phoneNumber = route.params.phoneNumber;
@@ -75,6 +76,7 @@ export function OtpScreen({ navigation, route, theme }: OtpScreenProps) {
     try {
       requestOtp(phoneNumber);
       setOtp("");
+      setSelection({ start: 0, end: 0 });
       setError("");
       setTimer(RESEND_DELAY_SECONDS);
     } catch (requestError) {
@@ -192,16 +194,29 @@ export function OtpScreen({ navigation, route, theme }: OtpScreenProps) {
 
               <Pressable
                 accessibilityLabel="Enter six digit verification code"
-                onPress={() => inputRef.current?.focus()}
                 style={[styles.otpEntry, { marginTop: 18 * scale }]}
               >
                 <View style={styles.otpSlots}>
                   {Array.from({ length: OTP_LENGTH }, (_, index) => {
-                    const isActive = index === Math.min(otp.length, OTP_LENGTH - 1);
+                    const isActive =
+                      index === Math.min(selection.start, OTP_LENGTH - 1);
                     const digit = otp[index] ?? "";
                     return (
-                      <View
+                      <Pressable
                         key={index}
+                        accessibilityLabel={
+                          digit
+                            ? `Digit ${index + 1}, ${digit}`
+                            : `Empty digit ${index + 1}`
+                        }
+                        accessibilityRole="button"
+                        accessibilityState={{ selected: isActive }}
+                        disabled={index > otp.length}
+                        onPress={() => {
+                          if (index > otp.length) return;
+                          setSelection({ start: index, end: index });
+                          inputRef.current?.focus();
+                        }}
                         style={[
                           styles.otpSlot,
                           {
@@ -222,7 +237,7 @@ export function OtpScreen({ navigation, route, theme }: OtpScreenProps) {
                         >
                           {digit}
                         </Text>
-                      </View>
+                      </Pressable>
                     );
                   })}
                 </View>
@@ -232,13 +247,44 @@ export function OtpScreen({ navigation, route, theme }: OtpScreenProps) {
                   autoComplete="one-time-code"
                   autoCorrect={false}
                   keyboardType="number-pad"
-                  maxLength={OTP_LENGTH}
                   onChangeText={(value) => {
-                    setOtp(value.replace(/\D/g, "").slice(0, OTP_LENGTH));
+                    const digits = value.replace(/\D/g, "");
+                    const cursorIndex = selection.start;
+                    const insertedIntoExistingDigit =
+                      digits.length === otp.length + 1 &&
+                      cursorIndex < otp.length;
+
+                    if (insertedIntoExistingDigit) {
+                      const nextOtp =
+                        otp.slice(0, cursorIndex) +
+                        digits[cursorIndex] +
+                        otp.slice(cursorIndex + 1);
+                      const nextCursor = Math.min(
+                        cursorIndex + 1,
+                        OTP_LENGTH,
+                      );
+                      setOtp(nextOtp.slice(0, OTP_LENGTH));
+                      setSelection({ start: nextCursor, end: nextCursor });
+                    } else {
+                      const nextOtp = digits.slice(0, OTP_LENGTH);
+                      const nextCursor =
+                        digits.length < otp.length
+                          ? Math.min(
+                              Math.max(cursorIndex - 1, 0),
+                              nextOtp.length,
+                            )
+                          : Math.min(digits.length, OTP_LENGTH);
+                      setOtp(nextOtp);
+                      setSelection({ start: nextCursor, end: nextCursor });
+                    }
                     if (error) setError("");
+                  }}
+                  onSelectionChange={({ nativeEvent }) => {
+                    setSelection(nativeEvent.selection);
                   }}
                   selectionColor={theme.colors.primary}
                   style={styles.hiddenOtpInput}
+                  selection={selection}
                   value={otp}
                 />
               </Pressable>
@@ -434,6 +480,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
     color: "transparent",
     opacity: 0.02,
+    pointerEvents: "none",
     zIndex: 1,
   },
   error: {

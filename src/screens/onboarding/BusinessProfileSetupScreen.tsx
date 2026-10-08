@@ -22,8 +22,9 @@ export function BusinessSetupScreen({
   navigation,
   theme,
 }: BusinessSetupScreenProps) {
-  const { updateBusiness } = useBusiness();
+  const { business, updateBusiness } = useBusiness();
   const { height, width } = useWindowDimensions();
+  const [ownerName, setOwnerName] = useState(business.ownerName ?? "");
   const [businessName, setBusinessName] = useState("Verma Electronics");
   const [businessType, setBusinessType] = useState<BusinessType>("Retail");
   const [currency, setCurrency] = useState<CurrencyCode>("INR");
@@ -35,12 +36,18 @@ export function BusinessSetupScreen({
   );
 
   const handleSave = () => {
+    const trimmedOwnerName = ownerName.trim();
     const name = businessName.trim();
+    if (!trimmedOwnerName) {
+      setError("Enter your name to continue.");
+      return;
+    }
     if (!name) {
       setError("Enter your business name to continue.");
       return;
     }
     updateBusiness({
+      ownerName: trimmedOwnerName,
       name,
       type: businessType,
       currency,
@@ -149,6 +156,17 @@ export function BusinessSetupScreen({
               },
             ]}
           >
+            <InputField
+              label="Your Name"
+              placeholder="Enter your name"
+              value={ownerName}
+              onChangeText={(value) => {
+                setOwnerName(value);
+                if (error) setError("");
+              }}
+              theme={theme}
+            />
+
             <InputField
               label="Business name"
               placeholder="Enter business name"

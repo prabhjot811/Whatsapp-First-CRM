@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Alert, Text, View, Pressable } from "react-native";
 import { AppButton, InputField } from "../../components/ui";
 import { FinanceScreenBackground } from "../../components/layout/FinanceScreenBackground";
+import { Header } from "../../components/layout/Header";
 import { isValidPhone } from "../../utils/validators";
 import type { BusinessType, CurrencyCode } from "../../types";
 import { useBusiness } from "../../hooks/useBusiness";
@@ -13,6 +14,7 @@ export function BusinessProfileScreen({
   theme,
 }: BusinessProfileScreenProps) {
   const { business: currentBusiness, updateBusiness } = useBusiness();
+  const [ownerName, setOwnerName] = useState(currentBusiness.ownerName || "");
   const [name, setName] = useState(currentBusiness.name);
   const [type, setType] = useState<BusinessType>(currentBusiness.type);
   const [phone, setPhone] = useState(currentBusiness.phone);
@@ -32,6 +34,7 @@ export function BusinessProfileScreen({
       return;
     }
     updateBusiness({
+      ownerName: ownerName.trim() || undefined,
       name: name.trim(),
       type,
       phone: phone.trim(),
@@ -49,9 +52,18 @@ export function BusinessProfileScreen({
           { backgroundColor: "transparent", paddingHorizontal: 20 },
         ]}
       >
-      <Text style={[styles.screenTitle, { color: theme.colors.textPrimary }]}>
-        Business Profile
-      </Text>
+      <Header
+        title="Edit Profile & Business Details"
+        theme={theme}
+        onBack={() => navigation.goBack()}
+      />
+      <InputField
+        label="Your name"
+        placeholder="Owner name"
+        value={ownerName}
+        onChangeText={setOwnerName}
+        theme={theme}
+      />
       <InputField
         label="Business name"
         placeholder="Business name"

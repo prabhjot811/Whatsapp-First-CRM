@@ -1,22 +1,35 @@
+import { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { AppButton, Card } from "../../components/ui";
 import { typography } from "../../constants/typography";
 import { mockService } from "../../services/mockServices";
+import { useBusiness } from "../../hooks/useBusiness";
 import { useCurrencyFormatter } from "../../hooks/useCurrencyFormatter";
-import { getGreeting, styles, useRefreshOnFocus } from "../shared";
+import { styles, useRefreshOnFocus } from "../shared";
 import type { HomeScreenProps } from "../shared";
+
+function getTimeOfDayGreeting(date: Date): string {
+  const hour = date.getHours();
+  if (hour < 12) return "Good Morning";
+  if (hour < 17) return "Good Afternoon";
+  return "Good Evening";
+}
 
 export function HomeScreen({ navigation, theme }: HomeScreenProps) {
   useRefreshOnFocus();
+  const { business } = useBusiness();
+  const [currentTime, setCurrentTime] = useState(() => new Date());
   const formatMoney = useCurrencyFormatter();
+  const ownerName = business.ownerName?.trim() || "there";
+
+  useEffect(() => {
+    const interval = setInterval(() => setCurrentTime(new Date()), 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
   const avatarTones = [
     `${theme.colors.success}18`,
     `${theme.colors.info}14`,
@@ -45,10 +58,7 @@ export function HomeScreen({ navigation, theme }: HomeScreenProps) {
         start={{ x: 0.05, y: 0 }}
         style={StyleSheet.absoluteFill}
       />
-      <View
-        pointerEvents="none"
-        style={dashboardStyles.wallpaper}
-      >
+      <View pointerEvents="none" style={dashboardStyles.wallpaper}>
         <View
           style={[
             dashboardStyles.wallpaperOrb,
@@ -110,407 +120,369 @@ export function HomeScreen({ navigation, theme }: HomeScreenProps) {
           />
         </View>
       </View>
-      <ScrollView
-        style={[styles.listContainer, dashboardStyles.transparent]}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-      >
-      <View style={styles.topBar}>
-        <Text
-          style={[
-            styles.greeting,
-            {
-              color: theme.colors.onPrimary,
-            },
-          ]}
+      <SafeAreaView edges={["top"]} style={dashboardStyles.safeArea}>
+        <ScrollView
+          style={[styles.listContainer, dashboardStyles.transparent]}
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
         >
-          {getGreeting()}, Raj 👋
-        </Text>
-      </View>
+          <View style={styles.topBar}>
+            <Text
+              style={[
+                styles.greeting,
+                {
+                  color: theme.colors.onPrimary,
+                },
+              ]}
+            >
+              {getTimeOfDayGreeting(currentTime)}, {ownerName} 👋
+            </Text>
+          </View>
 
-      <View
-        style={[
-          dashboardStyles.pendingCard,
-          {
-            borderRadius: theme.radius.lg,
-            boxShadow: `0px 9px 22px ${theme.colors.primary}30`,
-          },
-        ]}
-      >
-        <LinearGradient
-          colors={[
-            theme.colors.primaryDark,
-            theme.colors.primary,
-            theme.colors.primaryGradientEnd,
-          ]}
-          end={{ x: 1, y: 0.9 }}
-          start={{ x: 0, y: 0 }}
-          style={dashboardStyles.pendingGradient}
-        >
-          <View
-            pointerEvents="none"
-            style={[
-              dashboardStyles.pendingGlow,
-              { backgroundColor: `${theme.colors.onPrimary}0D` },
-            ]}
-          />
           <View
             style={[
-              dashboardStyles.pendingIcon,
+              dashboardStyles.pendingCard,
               {
-                backgroundColor: `${theme.colors.onPrimary}1C`,
-                borderColor: `${theme.colors.onPrimary}35`,
+                borderRadius: theme.radius.lg,
+                backgroundColor: "#d6f5d5",
+                borderColor: "#1B5E20",
+                boxShadow: `0px 9px 22px ${theme.colors.primary}30`,
               },
             ]}
           >
-            <Ionicons
-              name="wallet"
-              size={23}
-              color={theme.colors.onPrimary}
-            />
-          </View>
-          <View style={dashboardStyles.pendingCopy}>
-            <Text
-              style={[
-                dashboardStyles.pendingLabel,
-                { color: theme.colors.onPrimary },
-              ]}
+            <LinearGradient
+              colors={["#d6f5d5", "#d6f5d5"]}
+              style={dashboardStyles.pendingGradient}
             >
-              Total Pending
-            </Text>
-            <Text
-              style={[
-                dashboardStyles.pendingAmount,
-                { color: theme.colors.onPrimary },
-              ]}
-            >
-              {formatMoney(summary.totalPending)}
-            </Text>
+              <View
+                style={[
+                  dashboardStyles.pendingIcon,
+                  {
+                    backgroundColor: "#76C987",
+                    borderColor: "#1B5E20",
+                  },
+                ]}
+              >
+                <Ionicons name="wallet" size={23} color="#1A1A1A" />
+              </View>
+              <View style={dashboardStyles.pendingCopy}>
+                <Text
+                  style={[dashboardStyles.pendingLabel, { color: "#1A1A1A" }]}
+                >
+                  Total Pending
+                </Text>
+                <Text
+                  style={[dashboardStyles.pendingAmount, { color: "#1A1A1A" }]}
+                >
+                  {formatMoney(summary.totalPending)}
+                </Text>
+              </View>
+              <Ionicons name="trending-up" size={22} color="#1A1A1A" />
+            </LinearGradient>
           </View>
-          <Ionicons
-            name="trending-up"
-            size={22}
-            color={`${theme.colors.onPrimary}B8`}
-          />
-        </LinearGradient>
-      </View>
 
-      <View style={dashboardStyles.summaryGrid}>
-        <Card
-          theme={theme}
-          style={[
-            dashboardStyles.metricCard,
-            {
-              backgroundColor: "#FFF0D2",
-              borderColor: `${theme.colors.warning}45`,
-              borderRadius: theme.radius.md,
-              flex: 1,
-            },
-          ]}
-        >
-          <LinearGradient
-            colors={["#FFF6E2", "#FFE7BF"]}
-            end={{ x: 1, y: 1 }}
-            start={{ x: 0, y: 0 }}
-            style={[
-              StyleSheet.absoluteFill,
-              { borderRadius: theme.radius.md },
-            ]}
-          />
-          <View
-            style={[
-              dashboardStyles.metricIcon,
-              { backgroundColor: `${theme.colors.warning}28` },
-            ]}
-          >
-            <Ionicons
-              name="time"
-              size={18}
-              color={theme.colors.warning}
-            />
-          </View>
-          <View style={dashboardStyles.metricCopy}>
-            <Text
+          <View style={dashboardStyles.summaryGrid}>
+            <Card
+              theme={theme}
               style={[
-                dashboardStyles.metricLabel,
-                { color: "#111111" },
+                dashboardStyles.metricCard,
+                {
+                  backgroundColor: "#FFF0D2",
+                  borderColor: `${theme.colors.warning}45`,
+                  borderRadius: theme.radius.md,
+                  flex: 1,
+                },
               ]}
             >
-              Due Today
-            </Text>
-            <Text
+              <LinearGradient
+                colors={["#FFF6E2", "#FFE7BF"]}
+                end={{ x: 1, y: 1 }}
+                start={{ x: 0, y: 0 }}
+                style={[
+                  StyleSheet.absoluteFill,
+                  { borderRadius: theme.radius.md },
+                ]}
+              />
+              <View
+                style={[
+                  dashboardStyles.metricIcon,
+                  { backgroundColor: `${theme.colors.warning}28` },
+                ]}
+              >
+                <Ionicons name="time" size={18} color={theme.colors.warning} />
+              </View>
+              <View style={dashboardStyles.metricCopy}>
+                <Text
+                  style={[dashboardStyles.metricLabel, { color: "#111111" }]}
+                >
+                  Due Today
+                </Text>
+                <Text
+                  style={[dashboardStyles.metricValue, { color: "#111111" }]}
+                >
+                  {formatMoney(summary.dueToday)}
+                </Text>
+              </View>
+            </Card>
+            <Card
+              theme={theme}
               style={[
-                dashboardStyles.metricValue,
-                { color: "#111111" },
+                dashboardStyles.metricCard,
+                {
+                  backgroundColor: "#FFE5E8",
+                  borderColor: `${theme.colors.error}38`,
+                  borderRadius: theme.radius.md,
+                  flex: 1,
+                },
               ]}
             >
-              {formatMoney(summary.dueToday)}
-            </Text>
+              <LinearGradient
+                colors={["#FFF0F2", "#FFDDE2"]}
+                end={{ x: 1, y: 1 }}
+                start={{ x: 0, y: 0 }}
+                style={[
+                  StyleSheet.absoluteFill,
+                  { borderRadius: theme.radius.md },
+                ]}
+              />
+              <View
+                style={[
+                  dashboardStyles.metricIcon,
+                  { backgroundColor: `${theme.colors.error}20` },
+                ]}
+              >
+                <Ionicons
+                  name="alert-circle"
+                  size={18}
+                  color={theme.colors.error}
+                />
+              </View>
+              <View style={dashboardStyles.metricCopy}>
+                <Text
+                  style={[dashboardStyles.metricLabel, { color: "#111111" }]}
+                >
+                  Overdue
+                </Text>
+                <Text
+                  style={[dashboardStyles.metricValue, { color: "#111111" }]}
+                >
+                  {formatMoney(summary.overdue)}
+                </Text>
+              </View>
+            </Card>
           </View>
-        </Card>
-        <Card
-          theme={theme}
-          style={[
-            dashboardStyles.metricCard,
-            {
-              backgroundColor: "#FFE5E8",
-              borderColor: `${theme.colors.error}38`,
-              borderRadius: theme.radius.md,
-              flex: 1,
-            },
-          ]}
-        >
-          <LinearGradient
-            colors={["#FFF0F2", "#FFDDE2"]}
-            end={{ x: 1, y: 1 }}
-            start={{ x: 0, y: 0 }}
-            style={[
-              StyleSheet.absoluteFill,
-              { borderRadius: theme.radius.md },
-            ]}
-          />
-          <View
-            style={[
-              dashboardStyles.metricIcon,
-              { backgroundColor: `${theme.colors.error}20` },
-            ]}
-          >
-            <Ionicons
-              name="alert-circle"
-              size={18}
-              color={theme.colors.error}
-            />
-          </View>
-          <View style={dashboardStyles.metricCopy}>
-            <Text
-              style={[
-                dashboardStyles.metricLabel,
-                { color: "#111111" },
-              ]}
-            >
-              Overdue
-            </Text>
-            <Text
-              style={[
-                dashboardStyles.metricValue,
-                { color: "#111111" },
-              ]}
-            >
-              {formatMoney(summary.overdue)}
-            </Text>
-          </View>
-        </Card>
-      </View>
 
-      <Card
-        theme={theme}
-        style={[
-          dashboardStyles.collectedCard,
-          {
-            borderColor: `${theme.colors.success}30`,
-            borderRadius: theme.radius.md,
-          },
-        ]}
-      >
-        <View
-          style={[
-            dashboardStyles.collectedIcon,
-            { backgroundColor: `${theme.colors.success}14` },
-          ]}
-        >
-          <Ionicons
-            name="checkmark-circle"
-            size={19}
-            color={theme.colors.success}
-          />
-        </View>
-        <View>
-          <Text
-            style={[
-              dashboardStyles.metricLabel,
-              { color: theme.colors.textSecondary },
-            ]}
-          >
-            Collected This Month
-          </Text>
-          <Text
-            style={[
-              dashboardStyles.metricValue,
-              { color: theme.colors.success },
-            ]}
-          >
-            {formatMoney(summary.collectedThisMonth)}
-          </Text>
-        </View>
-      </Card>
-
-      <View style={dashboardStyles.sectionHeader}>
-        <Text
-          style={[
-            dashboardStyles.sectionTitle,
-            { color: theme.colors.onPrimary },
-          ]}
-        >
-          Needs Attention
-        </Text>
-      </View>
-      {attentionCustomers.map((customer, index) => {
-        const overdueBalance = mockService.getCustomerOverdueBalance(
-          customer.id,
-        );
-        const dueTodayBalance = mockService.getCustomerDueTodayBalance(
-          customer.id,
-        );
-        const isOverdue = overdueBalance > 0;
-        const dueAmount = isOverdue ? overdueBalance : dueTodayBalance;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const oldestOverdueDate = isOverdue
-          ? mockService
-              .getCustomerTransactions(customer.id)
-              .flatMap((transaction) => {
-                if (transaction.type !== "credit" || !transaction.dueDate) {
-                  return [];
-                }
-                const dueDate = new Date(transaction.dueDate);
-                dueDate.setHours(0, 0, 0, 0);
-                return [dueDate];
-              })
-              .filter((dueDate) => dueDate < today)
-              .sort((first, second) => first.getTime() - second.getTime())[0]
-          : undefined;
-        const overdueDays = oldestOverdueDate
-          ? Math.max(
-              1,
-              Math.floor(
-                (today.getTime() -
-                  new Date(
-                    oldestOverdueDate.getFullYear(),
-                    oldestOverdueDate.getMonth(),
-                    oldestOverdueDate.getDate(),
-                  ).getTime()) /
-                  86_400_000,
-              ),
-            )
-          : undefined;
-
-        return (
           <Card
-            key={customer.id}
             theme={theme}
             style={[
-              dashboardStyles.customerCard,
+              dashboardStyles.collectedCard,
               {
-                borderColor: `${theme.colors.primary}20`,
+                borderColor: `${theme.colors.success}30`,
                 borderRadius: theme.radius.md,
               },
             ]}
           >
-            <View style={dashboardStyles.customerRow}>
-              <View
+            <View
+              style={[
+                dashboardStyles.collectedIcon,
+                { backgroundColor: `${theme.colors.success}14` },
+              ]}
+            >
+              <Ionicons
+                name="checkmark-circle"
+                size={19}
+                color={theme.colors.success}
+              />
+            </View>
+            <View>
+              <Text
                 style={[
-                  dashboardStyles.avatar,
-                  {
-                    backgroundColor: avatarTones[index % avatarTones.length],
-                    borderColor: `${theme.colors.primary}22`,
-                  },
+                  dashboardStyles.metricLabel,
+                  { color: theme.colors.textSecondary },
                 ]}
               >
-                <Ionicons
-                  name="person"
-                  size={18}
-                  color={theme.colors.primaryDark}
-                />
-              </View>
-              <View style={dashboardStyles.customerCopy}>
-                <Text
-                  numberOfLines={1}
-                  style={[
-                    dashboardStyles.customerName,
-                    { color: theme.colors.textPrimary },
-                  ]}
-                >
-                  {customer.name}
-                </Text>
-                <Text
-                  numberOfLines={1}
-                  style={[
-                    dashboardStyles.customerMeta,
-                    { color: theme.colors.textSecondary },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      dashboardStyles.customerAmount,
-                      { color: theme.colors.error },
-                    ]}
-                  >
-                    {formatMoney(dueAmount)}
-                  </Text>
-                  <Text>  •  </Text>
-                  <Text
-                    style={{
-                      color: theme.colors.error,
-                      fontWeight: "700",
-                    }}
-                  >
-                    {isOverdue
-                      ? overdueDays
-                        ? `${overdueDays} ${
-                            overdueDays === 1 ? "day" : "days"
-                          } overdue`
-                        : "Overdue"
-                      : "Due today"}
-                  </Text>
-                </Text>
-              </View>
-              <Pressable
-                accessibilityRole="button"
-                onPress={() =>
-                  navigation.navigate("SendReminder", {
-                    customerId: customer.id,
-                  })
-                }
-                style={({ pressed }) => [
-                  dashboardStyles.remindButton,
-                  {
-                    backgroundColor: `${theme.colors.success}17`,
-                    borderColor: `${theme.colors.success}28`,
-                    borderRadius: theme.radius.sm,
-                    opacity: pressed ? 0.74 : 1,
-                  },
+                Collected This Month
+              </Text>
+              <Text
+                style={[
+                  dashboardStyles.metricValue,
+                  { color: theme.colors.success },
                 ]}
               >
-                <Text
-                  style={[
-                    dashboardStyles.remindText,
-                    { color: theme.colors.primaryDark },
-                  ]}
-                >
-                  Remind
-                </Text>
-              </Pressable>
+                {formatMoney(summary.collectedThisMonth)}
+              </Text>
             </View>
           </Card>
-        );
-      })}
 
-      <View style={styles.actionRow}>
-        <AppButton
-          title="Add Transaction"
-          onPress={() =>
-            navigation.navigate("AddDue", { customerId: "cust-1" })
-          }
-          theme={theme}
-        />
-        <AppButton
-          title="Add Customer"
-          onPress={() => navigation.navigate("AddCustomer")}
-          theme={theme}
-          variant="secondary"
-        />
-      </View>
-      </ScrollView>
+          <View style={dashboardStyles.sectionHeader}>
+            <Text
+              style={[
+                dashboardStyles.sectionTitle,
+                { color: theme.colors.onPrimary },
+              ]}
+            >
+              Needs Attention
+            </Text>
+          </View>
+          {attentionCustomers.map((customer, index) => {
+            const overdueBalance = mockService.getCustomerOverdueBalance(
+              customer.id,
+            );
+            const dueTodayBalance = mockService.getCustomerDueTodayBalance(
+              customer.id,
+            );
+            const isOverdue = overdueBalance > 0;
+            const dueAmount = isOverdue ? overdueBalance : dueTodayBalance;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const oldestOverdueDate = isOverdue
+              ? mockService
+                  .getCustomerTransactions(customer.id)
+                  .flatMap((transaction) => {
+                    if (transaction.type !== "credit" || !transaction.dueDate) {
+                      return [];
+                    }
+                    const dueDate = new Date(transaction.dueDate);
+                    dueDate.setHours(0, 0, 0, 0);
+                    return [dueDate];
+                  })
+                  .filter((dueDate) => dueDate < today)
+                  .sort(
+                    (first, second) => first.getTime() - second.getTime(),
+                  )[0]
+              : undefined;
+            const overdueDays = oldestOverdueDate
+              ? Math.max(
+                  1,
+                  Math.floor(
+                    (today.getTime() -
+                      new Date(
+                        oldestOverdueDate.getFullYear(),
+                        oldestOverdueDate.getMonth(),
+                        oldestOverdueDate.getDate(),
+                      ).getTime()) /
+                      86_400_000,
+                  ),
+                )
+              : undefined;
+
+            return (
+              <Card
+                key={customer.id}
+                theme={theme}
+                style={[
+                  dashboardStyles.customerCard,
+                  {
+                    borderColor: `${theme.colors.primary}20`,
+                    borderRadius: theme.radius.md,
+                  },
+                ]}
+              >
+                <View style={dashboardStyles.customerRow}>
+                  <View
+                    style={[
+                      dashboardStyles.avatar,
+                      {
+                        backgroundColor:
+                          avatarTones[index % avatarTones.length],
+                        borderColor: `${theme.colors.primary}22`,
+                      },
+                    ]}
+                  >
+                    <Ionicons
+                      name="person"
+                      size={18}
+                      color={theme.colors.primaryDark}
+                    />
+                  </View>
+                  <View style={dashboardStyles.customerCopy}>
+                    <Text
+                      numberOfLines={1}
+                      style={[
+                        dashboardStyles.customerName,
+                        { color: theme.colors.textPrimary },
+                      ]}
+                    >
+                      {customer.name}
+                    </Text>
+                    <Text
+                      numberOfLines={1}
+                      style={[
+                        dashboardStyles.customerMeta,
+                        { color: theme.colors.textSecondary },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          dashboardStyles.customerAmount,
+                          { color: theme.colors.error },
+                        ]}
+                      >
+                        {formatMoney(dueAmount)}
+                      </Text>
+                      <Text> • </Text>
+                      <Text
+                        style={{
+                          color: theme.colors.error,
+                          fontWeight: "700",
+                        }}
+                      >
+                        {isOverdue
+                          ? overdueDays
+                            ? `${overdueDays} ${
+                                overdueDays === 1 ? "day" : "days"
+                              } overdue`
+                            : "Overdue"
+                          : "Due today"}
+                      </Text>
+                    </Text>
+                  </View>
+                  <Pressable
+                    accessibilityRole="button"
+                    onPress={() =>
+                      navigation.navigate("SendReminder", {
+                        customerId: customer.id,
+                      })
+                    }
+                    style={({ pressed }) => [
+                      dashboardStyles.remindButton,
+                      {
+                        backgroundColor: `${theme.colors.success}17`,
+                        borderColor: `${theme.colors.success}28`,
+                        borderRadius: theme.radius.sm,
+                        opacity: pressed ? 0.74 : 1,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        dashboardStyles.remindText,
+                        { color: theme.colors.primaryDark },
+                      ]}
+                    >
+                      Remind
+                    </Text>
+                  </Pressable>
+                </View>
+              </Card>
+            );
+          })}
+
+          <View style={styles.actionRow}>
+            <AppButton
+              title="Add Transaction"
+              onPress={() => navigation.navigate("AddDue")}
+              theme={theme}
+            />
+            <AppButton
+              title="Add Customer"
+              onPress={() => navigation.navigate("AddCustomer")}
+              theme={theme}
+              variant="secondary"
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </View>
   );
 }
@@ -522,6 +494,10 @@ const dashboardStyles = StyleSheet.create({
     flex: 1,
     overflow: "hidden",
     position: "relative",
+  },
+  safeArea: {
+    backgroundColor: "transparent",
+    flex: 1,
   },
   transparent: {
     backgroundColor: "transparent",

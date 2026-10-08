@@ -58,11 +58,7 @@ export function TransactionsScreen({
           description="Your transaction history will appear here."
           theme={theme}
           actionLabel="Add Transaction"
-          onAction={() =>
-            navigation.navigate("AddDue", {
-              customerId: mockService.getCustomers()[0]?.id ?? "cust-1",
-            })
-          }
+          onAction={() => navigation.navigate("AddDue")}
         />
       ) : null}
       {filtered.map((transaction) => (

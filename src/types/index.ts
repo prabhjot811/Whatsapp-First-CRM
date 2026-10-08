@@ -27,6 +27,7 @@ export interface User {
 
 export interface Business {
   id: string;
+  ownerName?: string;
   name: string;
   type: BusinessType;
   phone: string;
